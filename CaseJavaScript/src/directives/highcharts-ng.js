@@ -1,3 +1,6 @@
+/**
+ * Created by aioffe on 10/20/13.
+ */
 'use strict';
 
 angular.module('highcharts-ng', [])
@@ -87,6 +90,11 @@ angular.module('highcharts-ng', [])
             if(config.xAxis) {
                 mergedOptions.xAxis = angular.copy(config.xAxis);
             };
+
+            if(config.yAxis) {
+                mergedOptions.yAxis = angular.copy(config.yAxis);
+            };
+
             if(config.title) {
                 mergedOptions.title = config.title;
             };
@@ -212,6 +220,17 @@ angular.module('highcharts-ng', [])
                         chart.redraw();
                     }
                 }, true);
+
+                scope.$watch("config.yAxis", function (newAxes, oldAxes) {
+                    if (newAxes === oldAxes) return;
+                    if(newAxes) {
+                        chart.yAxis[0].update(newAxes);
+                        //updateZoom(chart.xAxis[0], angular.copy(newAxes));
+                        chart.redraw();
+                    }
+                }, true);
+
+
                 scope.$watch("config.options", function (newOptions, oldOptions, scope) {
                     //do nothing when called on registration
                     if (newOptions === oldOptions) return;
