@@ -1,45 +1,14 @@
 package org.thepredicate;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BankrupcySolution {
 
-	public static final double SIGMA = 0.01d;
-
-	public static boolean approximatelyEquals(double number, double target) {
-		double lowerBound = target - SIGMA;
-		double upperBound = target + SIGMA;
-		return (number >= lowerBound && number <= upperBound);
-	}
-
-	public static class Claimant {
-
-		public Claimant(double claim) {
-			this.claim = claim;
-		}
-
-		public double payout;
-		public double claim;
-
-		public double halfClaim() {
-			return claim / 2d;
-		}
-
-		public double getLoss() {
-			return claim - payout;
-		}
-
-		public boolean hasHalf() {
-			return approximatelyEquals(payout, halfClaim());
-		}
-
-		@Override
-		public String toString() {
-			DecimalFormat df = new DecimalFormat("#.##");
-			return "(Owe: " + df.format(claim) + ", Has: " + df.format(payout) + ")";
-		}
+	public static double runScenario(List<Claimant> claimants, double totalEstate) {
+		double remaining = BankrupcySolution.upwardFiller(claimants, totalEstate);
+		remaining = BankrupcySolution.downwardFiller(claimants, remaining);
+		return remaining;
 	}
 
 	public static double downwardFiller(List<Claimant> claimants, double totalEstate) {
@@ -59,7 +28,7 @@ public class BankrupcySolution {
 			double upwardDifference = findUpwardDifference(downardClaimants, compenseers);
 
 			// compensate this difference to all the compenseers (if no money left at this point then exit)
-			accountLeft = redeemClaimantsEquallyUpToAmount(compenseers, upwardDifference, accountLeft);
+			accountLeft = redeemClaimantsEquallyUpToAmount(compenseers, upwardDifference, accountLeft, false);
 
 			// put the next lowest into the compenseers (beginning of the array) and continue
 			addFirstFromLast(compenseers, downardClaimants);
@@ -68,7 +37,7 @@ public class BankrupcySolution {
 		// at this point we need to distribute to the lowest claimant (downwardClaimants is zero)
 		// and his updardDifference is compared to zero but the findUpwardDifference method can do that
 		double upwardDifference = findUpwardDifference(downardClaimants, compenseers);
-		accountLeft = redeemClaimantsEquallyUpToAmount(compenseers, upwardDifference, accountLeft);
+		accountLeft = redeemClaimantsEquallyUpToAmount(compenseers, upwardDifference, accountLeft, false);
 
 		return accountLeft;
 	}
@@ -94,7 +63,7 @@ public class BankrupcySolution {
 		ArrayList<Claimant> upwardClaimants = new ArrayList<Claimant>(claimants);
 		double remainingEstate = totalEstate;
 		while (remainingEstate > 0 && upwardClaimants.size() > 0) {
-			remainingEstate = incrementSplitter(upwardClaimants, remainingEstate);
+			remainingEstate = upwardIncrementSplitter(upwardClaimants, remainingEstate);
 			upwardClaimants.remove(0);
 		}
 		return remainingEstate;
@@ -103,7 +72,7 @@ public class BankrupcySolution {
 
 	// assumes claimants are sorted, lowest-claim claimant to higher claim claimant
 	// returns amount of estate left
-	public static double incrementSplitter(List<Claimant> claimants, double totalEstate) {
+	public static double upwardIncrementSplitter(List<Claimant> claimants, double totalEstate) {
 		// special case if there are no claimants
 		if (claimants.size() == 0) {
 			return totalEstate;
@@ -118,34 +87,39 @@ public class BankrupcySolution {
 		double lowestHalfClaim = lowestClaimant.halfClaim();
 
 		// find the difference between what they have NOW (i.e. already), and their half payment
-		double lowestDifferenceInterval = lowestHalfClaim - lowestClaimant.payout;
+		double lowestDifferenceInterval = lowestHalfClaim - lowestClaimant.getPayout();
 
 		// redeem the claimants from the estate up to that amount
-		double remainingEstate = redeemClaimantsEquallyUpToAmount(claimants, lowestDifferenceInterval, totalEstate);
+		double remainingEstate = redeemClaimantsEquallyUpToAmount(claimants, lowestDifferenceInterval, totalEstate, true);
 
 		return remainingEstate;
 	}
 
-	public static double redeemClaimantsEquallyUpToAmount(List<Claimant> claimants, double redeemAmount, double totalAccount) {
+	public static double redeemClaimantsEquallyUpToAmount(List<Claimant> claimants, double redeemAmount, double totalAccount, boolean isFirstPass) {
 		// find the total sum that would be owed to the claimants
 		double totalRedeemAmount = redeemAmount * claimants.size();
 
 		// if the estate has enough to pay them equally, do that... and then return amount of money left
 		if (totalAccount >= totalRedeemAmount) {
-			redeemClaimantsEqually(claimants, redeemAmount);
+			redeemClaimantsEqually(claimants, redeemAmount, true);
 			return (totalAccount - totalRedeemAmount);
 		}
 
 		// otherwise split the money equally... and return 0
 		double insufficientRedeemAmount = totalAccount / claimants.size();
-		redeemClaimantsEqually(claimants, insufficientRedeemAmount);
+		redeemClaimantsEqually(claimants, insufficientRedeemAmount, isFirstPass);
 
 		return 0;
 	}
 
-	public static void redeemClaimantsEqually(List<Claimant> claimants, double redeemAmount) {
+	private static void redeemClaimantsEqually(List<Claimant> claimants, double redeemAmount, boolean isFirstPass) {
 		for (Claimant claimant : claimants) {
-			claimant.payout += redeemAmount;
+
+			if (isFirstPass) {
+				claimant.setFirstPassPayout(claimant.getFirstPassPayout() + redeemAmount);
+			} else {
+				claimant.setSecondPassPayout(claimant.getSecondPassPayout() + redeemAmount);
+			}
 		}
 	}
 

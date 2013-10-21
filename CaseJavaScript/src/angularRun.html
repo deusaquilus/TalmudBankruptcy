@@ -1,0 +1,102 @@
+<html>
+<head></head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.min.js"></script>
+
+<style type="text/css">
+    table, tr, td {
+        border: 1px solid;
+        border-collapse: collapse;
+        padding: 5px;
+    }
+</style>
+
+<script type="text/javascript">
+    var myApp = angular.module("myApp", []);
+
+    myApp.factory('Data', function(ElementNumberData){
+        var data = {};
+
+        var objects = [
+            {name:"one", value:1},
+            {name:"two", value:2},
+            {name:"three", value:3},
+            {name:"four", value:4},
+            {name:"five", value:5},
+            {name:"six", value:6}
+        ];
+
+        data.objects = objects;
+
+        data.objectSlice = function(){
+            return objects.slice(0, ElementNumberData.number);
+        };
+
+        return data;
+    });
+
+    myApp.factory('ElementNumberData', function(){
+        return {number:3};
+    });
+
+    //myApp.factory('DerivedData', function(Data, ElementNumberData){
+    //});
+
+    function WatchedDataControl($scope, ElementNumberData, Data) {
+
+        ElementNumberData.$watch('number', function(newVal){
+            alert("in here");
+            $scope.watchedObjects = Data.objects.slice(0, newVal);
+        });
+
+        //$scope.data = Data.objects.slice(0, ElementNumberData.number);
+        //alert(JSON.stringify($scope.data));
+    }
+
+    function DataControl($scope, Data) {
+        $scope.data = Data;
+    }
+
+    function NumberControl($scope, ElementNumberData) {
+        $scope.elementNumberData = ElementNumberData;
+    }
+
+</script>
+
+<div ng-app="myApp">
+
+    <h4>Number Control</h4>
+    <div ng-controller="NumberControl">
+        <input ng-model="elementNumberData.number" type="text"></input>
+    </div>
+
+    <h4>Data</h4>
+    <table ng-controller="DataControl">
+        <tr ng-repeat="object in data.objects">
+            <td>{{object.name}}</td><td>{{object.value}}</td>
+        </tr>
+    </table>
+
+    <!--
+    Note that if a controller is missing the entire angularjs will not kick off
+    i.e. none of the controls will be rendered
+    -->
+    <h4>Watched Data</h4>
+    <table ng-controller="WatchedDataControl">
+        <tr ng-repeat="object in data.watchedObjects">
+            <td>{{object.name}}</td><td>{{object.value}}</td>
+        </tr>
+    </table>
+
+    <h4>Derived Data</h4>
+    <table ng-controller="DataControl">
+        <tr ng-repeat="object in data.objectSlice()">
+            <td>{{object.name}}</td><td>{{object.value}}</td>
+        </tr>
+    </table>
+</div>
+
+
+
+</body>
+</html>

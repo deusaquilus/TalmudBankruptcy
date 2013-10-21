@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="utf-8">
+    <title>Custom Plunker</title>
+    <link rel="stylesheet" type="text/css" href="http://angular-ui.github.com/ng-grid/css/ng-grid.css" />
+
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.js"></script>-->
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.js"></script>
+    <script type="text/javascript" src="http://angular-ui.github.com/ng-grid/lib/ng-grid.debug.js"></script>
+
+    <!-- Doesn't look like including it explicitly is needed -->
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+
+    <!-- Highcharts directive for angular -->
+    <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
+    <script src="../src/directives/highcharts-ng.js"></script>
+
+    <!-- Claimant data model (TODO what happens when they're loaded out of order) -->
+    <script type="text/javascript" src="Claimant.js"></script>
+    <script type="text/javascript" src="BankrupcySolution.js"></script>
+    <script type="text/javascript" src="BankrupcyCaseWrapper.js"></script>
+</head>
+<body ng-controller="MyCtrl">
+
+<style type="text/css">
+        /*style.css*/
+    .gridStyle {
+        border: 1px solid rgb(212,212,212);
+        width: 400px;
+        height: 300px
+    }
+</style>
+
+<script type="text/javascript">
+
+    var app = angular.module('myApp', ['ngGrid', "highcharts-ng"]);
+
+    function clearArrayAndPopulateWith(array, populateWith) {
+        array.length = 0;
+        populateWith.forEach(function(value){
+            array.push(value);
+        });
+    }
+
+    app.filter('round2', function(){
+        return function(value) {
+            var output = Math.round(value * 100) / 100;
+            return output;
+        }
+    });
+
+
+    app.factory('ClaimantsData', function(){
+        return {
+            estate: 300,
+            numClaimants:3,
+            maxNumClaimants:20,
+            fullClaimantsList: Engine.BankrupcyCaseWrapper.createClaimants(100, 100, 20),
+            // we need a special array to keep track of the data since if claimants()
+            // returns a differnet object every time (i.e. an array that represents a slice
+            // of the 'fullClaimantsList' then each successive call will make angular call
+            // another '$digest' function and there will be an infinite loop
+            selectedClaimants:[],
+            claimants: function() {
+                // recalculate all the payoffs
+                Engine.BankrupcyCaseWrapper.resetPayoffsToZero(this.fullClaimantsList);
+                var filteredClaimants = this.fullClaimantsList.slice(0, this.numClaimants);
+                Engine.BankrupcyCaseWrapper.runEngine(filteredClaimants, this.estate);
+
+                // clear the array and fill the 'selected payments array back'
+                clearArrayAndPopulateWith(this.selectedClaimants, filteredClaimants);
+
+                return this.selectedClaimants;
+            },
+
+            payoutSeriesInternal:[],
+            payoutSeries: function(){
+                clearArrayAndPopulateWith(this.payoutSeriesInternal, Engine.BankrupcyCaseWrapper.getPayouts(this.claimants()));
+                return this.payoutSeriesInternal;
+            },
+
+            categoriesInternal:[],
+            categories:function() {
+                clearArrayAndPopulateWith(this.categoriesInternal, Engine.BankrupcyCaseWrapper.getCategories(this.claimants()));
+                return this.categoriesInternal;
+            }
+
+        };
+    });
+
+    app.controller('MyCtrl', function($scope, ClaimantsData) {
+        $scope.data = ClaimantsData;
+        $scope.gridOptions = {
+            data: 'data.claimants()',
+            enableCellSelection: true,
+            enableCellEdit: true,
+            enableRowSelection: false,
+            columnDefs:[
+                {field: 'name',displayName: 'Name', enableCellEdit: true},
+                {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
+                {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'}
+
+            ]
+        };
+    });
+
+//    function DisplayController($scope, ClaimantsData){
+//
+//        $scope.data = ClaimantsData;
+//        $scope.$watch('data', function(){
+//            $scope.output = JSON.stringify($scope.data.claimants(), null, 2);
+//        }, true);
+//
+//        $scope.output = JSON.stringify($scope.data.claimants(), null, 2);
+//    }
+
+    function ClaimantsEditorControl($scope, ClaimantsData) {
+        $scope.data = ClaimantsData;
+    }
+
+    function PayoffChartControl($scope, ClaimantsData) {
+
+        $scope.data = ClaimantsData;
+
+        $scope.chart = {
+            options: {
+                chart: {
+                    type: 'column'
+                }
+            },
+            xAxis: {
+                categories: []
+            },
+            yAxis: {
+                max: Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants())
+            },
+            series: [
+                {data: []}
+            ],
+            title: {
+                text: 'Hello'
+            },
+            loading: false
+        };
+
+        // watch the payout series (i.e. how much claimants are getting) and update the graph accordingly
+        $scope.$watch('data.payoutSeries()', function(){
+            var payoutSeriesArray = $scope.chart.series[0].data;
+            clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
+        }, true);
+
+        // watch the data categories i.e. claimant names and update accordingly
+        $scope.$watch('data.categories()', function(){
+            var categoriesArray = $scope.chart.xAxis.categories;
+            clearArrayAndPopulateWith(categoriesArray, ClaimantsData.categories());
+        }, true);
+
+        // watch the claimants and see if the claims have changed
+        $scope.$watch('data.claimants()', function(){
+            // and update the maximal estate size on the axis accordingly
+            $scope.chart.yAxis.max = Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants());
+        }, true);
+
+    }
+
+
+</script>
+
+
+
+<div>
+
+    <div ng-controller="PayoffChartControl" style="width:50%">
+        <highchart id="chart1" config="chart"></highchart>
+    </div>
+
+
+    <div class="gridStyle" ng-grid="gridOptions"></div>
+
+    <!--<div ng-controller="DisplayController">-->
+        <!--<pre>-->
+        <!--{{output}}-->
+        <!--</pre>-->
+    <!--</div>-->
+
+    <label>Num Claimants</label>
+    <input type="number" ng-controller="ClaimantsEditorControl" ng-model="data.numClaimants"></input>
+
+    <label>Estate Size</label>
+    <input type="number" ng-controller="ClaimantsEditorControl" ng-model="data.estate"></input>
+
+</div>
+
+</body>
+</html>
