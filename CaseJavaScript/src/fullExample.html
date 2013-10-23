@@ -2,12 +2,9 @@
 <html ng-app="myApp">
 <head lang="en">
     <meta charset="utf-8">
-    <title>Custom Plunker</title>
+    <title>Talmudic Bankrupcy Algorithm Visualization</title>
+
     <link rel="stylesheet" type="text/css" href="http://angular-ui.github.com/ng-grid/css/ng-grid.css" />
-
-    <!-- TODO, Try removing this first link -->
-    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.js"></script>-->
@@ -30,211 +27,83 @@
     <script type="text/javascript" src="Claimant.js"></script>
     <script type="text/javascript" src="BankrupcySolution.js"></script>
     <script type="text/javascript" src="BankrupcyCaseWrapper.js"></script>
+
+    <script type="text/javascript" src="BankrupcyCase.js"></script>
+
 </head>
-<body ng-controller="MyCtrl">
+<body>
 
 <style type="text/css">
-        /*style.css*/
+
     .gridStyle {
         border: 1px solid rgb(212,212,212);
         width: 400px;
-        height: 300px
+        height: 300px;
     }
+
+    .expand {
+        width: 100%;
+        height: 100%;
+        margin-left:20px;
+    }
+
+    .largeFont {
+        font-size:1.1em;
+        margin-left:10px;
+    }
+
+    .creditorsSpinner {
+        font-size:1em;
+        width:3em;
+        padding:2px;
+        margin:0;
+        border:1px solid #ddd;
+        border-radius:5px;
+
+    }
+
+    .estateSpinner {
+        font-size:1em;
+        width:6em;
+        padding:2px;
+        border:1px solid #ddd;
+        border-radius:5px;
+    }
+
 </style>
-
-<script type="text/javascript">
-
-    var app = angular.module('myApp', ['ngGrid', "highcharts-ng"]);
-
-    function clearArrayAndPopulateWith(array, populateWith) {
-        array.length = 0;
-        populateWith.forEach(function(value){
-            array.push(value);
-        });
-    }
-
-    app.directive("hslider", function(){
-        return {
-            restrict:"E",
-            scope: {
-                value:"=",
-                min:"=",
-                max:"=",
-                step:"="
-            },
-
-            link: function(scope, element, attrs) {
-                var firstDiv = $(element).find("div")[0];
-                var firstDivElement = $(firstDiv);
-
-                firstDivElement.slider({
-                    value: scope.value,
-                    min: scope.min,
-                    max: scope.max,
-                    step: scope.step,
-                    orientation:'vertical',
-                    slide: function( event, ui ) {
-                        // when the user adjusts the slider, update the value
-                        scope.$apply("value=" + ui.value);
-                    }
-                });
-
-                //
-                scope.$watch("value", function(newValue){
-                    // when the value changes outside the slider, update the slider
-                    firstDivElement.slider("value", newValue);
-                });
-            },
-            template: '<div></div>'
-        }
-    });
-
-
-
-    app.filter('round2', function(){
-        return function(value) {
-            var output = Math.round(value * 100) / 100;
-            return output;
-        }
-    });
-
-
-    app.factory('ClaimantsData', function(){
-        return {
-            estate: 300,
-            numClaimants:3,
-            maxNumClaimants:20,
-            fullClaimantsList: Engine.BankrupcyCaseWrapper.createClaimants(100, 100, 20),
-            // we need a special array to keep track of the data since if claimants()
-            // returns a differnet object every time (i.e. an array that represents a slice
-            // of the 'fullClaimantsList' then each successive call will make angular call
-            // another '$digest' function and there will be an infinite loop
-            selectedClaimants:[],
-            claimants: function() {
-                // recalculate all the payoffs
-                Engine.BankrupcyCaseWrapper.resetPayoffsToZero(this.fullClaimantsList);
-                var filteredClaimants = this.fullClaimantsList.slice(0, this.numClaimants);
-                Engine.BankrupcyCaseWrapper.runEngine(filteredClaimants, this.estate);
-
-                // clear the array and fill the 'selected payments array back'
-                clearArrayAndPopulateWith(this.selectedClaimants, filteredClaimants);
-
-                return this.selectedClaimants;
-            },
-
-            payoutSeriesInternal:[],
-            payoutSeries: function(){
-                clearArrayAndPopulateWith(this.payoutSeriesInternal, Engine.BankrupcyCaseWrapper.getPayouts(this.claimants()));
-                return this.payoutSeriesInternal;
-            },
-
-            categoriesInternal:[],
-            categories:function() {
-                clearArrayAndPopulateWith(this.categoriesInternal, Engine.BankrupcyCaseWrapper.getCategories(this.claimants()));
-                return this.categoriesInternal;
-            }
-
-        };
-    });
-
-    app.controller('MyCtrl', function($scope, ClaimantsData) {
-        $scope.data = ClaimantsData;
-        $scope.gridOptions = {
-            data: 'data.claimants()',
-            enableCellSelection: true,
-            enableCellEdit: true,
-            enableRowSelection: false,
-            columnDefs:[
-                {field: 'name',displayName: 'Name', enableCellEdit: true},
-                {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
-                {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'}
-
-            ]
-        };
-    });
-
-    function ClaimantsEditorControl($scope, ClaimantsData) {
-        $scope.data = ClaimantsData;
-    }
-
-    function SliderControl($scope, ClaimantsData) {
-        $scope.data = ClaimantsData;
-    }
-
-    function PayoffChartControl($scope, ClaimantsData) {
-
-        $scope.data = ClaimantsData;
-
-        $scope.chart = {
-            options: {
-                chart: {
-                    type: 'column'
-                }
-            },
-            xAxis: {
-                categories: []
-            },
-            yAxis: {
-                max: Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants())
-            },
-            series: [
-                {data: []}
-            ],
-            title: {
-                text: 'Hello'
-            },
-            loading: false
-        };
-
-        // watch the payout series (i.e. how much claimants are getting) and update the graph accordingly
-        $scope.$watch('data.payoutSeries()', function(){
-            var payoutSeriesArray = $scope.chart.series[0].data;
-            clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
-        }, true);
-
-        // watch the data categories i.e. claimant names and update accordingly
-        $scope.$watch('data.categories()', function(){
-            var categoriesArray = $scope.chart.xAxis.categories;
-            clearArrayAndPopulateWith(categoriesArray, ClaimantsData.categories());
-        }, true);
-
-        // watch the claimants and see if the claims have changed
-        $scope.$watch('data.claimants()', function(){
-            // and update the maximal estate size on the axis accordingly
-            $scope.chart.yAxis.max = Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants());
-        }, true);
-
-
-        $scope.$watch('data.estate', function(){
-            var payoutSeriesArray = $scope.chart.series[0].data;
-            clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
-        }, true);
-    }
-
-
-</script>
-
-
 
 <div>
 
-    <div ng-controller="PayoffChartControl" style="width:50%">
-        <highchart id="chart1" config="chart"></highchart>
-    </div>
+    <hbox valign="top" align="middle" >
+        <div ng-controller="PayoffChartControl">
+            <highchart id="chart1" config="chart"></highchart>
+        </div>
 
-    <!--style="border: solid 2px; width: 200px; height: 200px"-->
+        <!--style="border: solid 2px; width: 200px; height: 200px"-->
+        <div ng-controller="SliderControl" style="display: inline-block; height: 100%">
+            <slider value="data.estate" min="0" max="data.maxEstateSize()" step="1" direction="vertical"></slider>
+        </div>
+        <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
 
-    <div ng-controller="SliderControl" ><!-- TODO Try pitting it on the slider itself -->
-        <hslider value="data.estate" min="0" max="600" step="1"></hslider>
-    </div>
+        <div class="expand">
+            <div ng-controller="GridController">
+                <div class="gridStyle" ng-grid="gridOptions"></div>
+            </div>
 
-    <div class="gridStyle" ng-grid="gridOptions"></div>
+            <hbox>
+                <div>
+                    <label class="largeFont">Creditors</label>
+                    <input class="creditorsSpinner" size="4" type="number" ng-controller="ClaimantsEditorControl" ng-model="data.numClaimants"></input>
+                </div>
 
-    <label>Num Claimants</label>
-    <input type="number" ng-controller="ClaimantsEditorControl" ng-model="data.numClaimants"></input>
+                <div>
+                    <label class="largeFont">Estate</label>
+                    <input class="estateSpinner" size="4" type="number" ng-controller="ClaimantsEditorControl" ng-model="data.estate"></input>
+                </div>
+            </hbox>
+        </div>
+    </hbox>
 
-    <label>Estate Size</label>
-    <input type="number" ng-controller="ClaimantsEditorControl" ng-model="data.estate"></input>
 
 </div>
 

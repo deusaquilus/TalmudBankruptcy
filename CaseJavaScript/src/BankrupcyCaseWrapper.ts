@@ -6,6 +6,16 @@
 module Engine {
     export class BankrupcyCaseWrapper {
 
+        public static getMaximalEstateSize(claimants:Array<Engine.Claimant>):number {
+            var maxEstateSize:number = 0;
+
+            claimants.forEach(function(claimant:Engine.Claimant){
+                maxEstateSize += claimant.claim;
+            });
+
+            return maxEstateSize;
+        }
+
 
         public static getMaximalEstateClaimant(claimants:Array<Engine.Claimant>):number {
             var maximalClaim:number = 0;
@@ -85,7 +95,7 @@ module Engine {
             var claimants:Array<Engine.Claimant> = [];
             var i:number = 1;
             claims.forEach(function(claimAmount:number){
-                claimants.push(new Engine.Claimant("Claimant " + i, claimAmount));
+                claimants.push(new Engine.Claimant("Creditor " + i, claimAmount));
                 i++;
             });
             return claimants;

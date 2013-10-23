@@ -8,6 +8,16 @@ var Engine;
     var BankrupcyCaseWrapper = (function () {
         function BankrupcyCaseWrapper() {
         }
+        BankrupcyCaseWrapper.getMaximalEstateSize = function (claimants) {
+            var maxEstateSize = 0;
+
+            claimants.forEach(function (claimant) {
+                maxEstateSize += claimant.claim;
+            });
+
+            return maxEstateSize;
+        };
+
         BankrupcyCaseWrapper.getMaximalEstateClaimant = function (claimants) {
             var maximalClaim = 0;
 
@@ -84,7 +94,7 @@ var Engine;
             var claimants = [];
             var i = 1;
             claims.forEach(function (claimAmount) {
-                claimants.push(new Engine.Claimant("Claimant " + i, claimAmount));
+                claimants.push(new Engine.Claimant("Creditor " + i, claimAmount));
                 i++;
             });
             return claimants;
