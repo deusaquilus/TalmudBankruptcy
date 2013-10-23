@@ -65,24 +65,27 @@
 
             link: function(scope, element, attrs) {
                 var firstDiv = $(element).find("div")[0];
-                $(firstDiv).slider({
+                var firstDivElement = $(firstDiv);
+
+                firstDivElement.slider({
                     value: scope.value,
                     min: scope.min,
                     max: scope.max,
                     step: scope.step,
                     orientation:'vertical',
                     slide: function( event, ui ) {
-                        //scope.value = ui.value;
+                        // when the user adjusts the slider, update the value
                         scope.$apply("value=" + ui.value);
                     }
                 });
 
+                //
+                scope.$watch("value", function(newValue){
+                    // when the value changes outside the slider, update the slider
+                    firstDivElement.slider("value", newValue);
+                });
             },
-
-            template: function(element, attrs) {
-                var htmlText =  '<div></div>';
-                return angular.element(htmlText);
-            }
+            template: '<div></div>'
         }
     });
 
