@@ -62,6 +62,7 @@ app.directive("hbox", function(){
 
 
 app.directive("slider", function(){
+
     return {
         restrict:"E",
         scope: {
@@ -70,6 +71,10 @@ app.directive("slider", function(){
             max:"=",
             step:"="
         },
+
+        // you'l get a 'TypeError: undefined is not a function' if this isn't true & you use ng-transclude
+        // or a bunch of other possible errors
+        transclude: true,
 
         link: function(scope, element, attrs) {
 
@@ -83,6 +88,7 @@ app.directive("slider", function(){
             var firstDiv = $(element).find("div")[0];
             var firstDivElement = $(firstDiv);
 
+
             firstDivElement.slider({
                 value: scope.value,
                 min: scope.min,
@@ -92,6 +98,9 @@ app.directive("slider", function(){
                 slide: function( event, ui ) {
                     // when the user adjusts the slider, update the value
                     scope.$apply("value=" + ui.value);
+
+                    //$('.qtip:visible').qtip('reposition');
+
                 }
             });
 
@@ -105,17 +114,52 @@ app.directive("slider", function(){
                 //firstDivElement.height("5px");
             }
 
+            var handle = firstDivElement.find("a");
+            var qtipInstance = handle.qtip();
+
+//            var qtipInstance = handle.qtip({
+//
+//                position: {
+//                    container: handle,
+//                    my: "left center",
+//                    at: "right center"
+//                },
+//                content: {
+//                    text: scope.value
+//                },
+//                show: true,
+//                hide: false,
+//                style: {
+//                    classes: 'qtip-light',
+//                    width: 50
+//                }
+//            });
+
+
             //
             scope.$watch("value", function(newValue){
                 // when the value changes outside the slider, update the slider
                 firstDivElement.slider("value", newValue);
+
+                // TODO This is a lot of work to call a these every time something is moved
+                // see if we can move these things out into some other method and keep
+                // a boolean to make sure that it's changed the first time this field is used
+                qtipInstance.qtip('option', 'content.text', newValue);
+                qtipInstance.qtip('option', 'style.width', 60);
+                qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
             scope.$watch("max", function(newValue){
                 firstDivElement.slider("option", "max", newValue);
+                qtipInstance.qtip('option', 'content.text', newValue);
+                qtipInstance.qtip('option', 'style.width', 60);
+                qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
+
+
+            //$(firstDiv).attr("title", "foo bar baz");
         },
-        template: '<div></div>'
+        template: '<div ng-transclude></div>'
     }
 });
 
@@ -207,13 +251,16 @@ function PayoffChartControl($scope, ClaimantsData) {
             categories: []
         },
         yAxis: {
-            max: Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants())
+            max: Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants()),
+            title: {
+                text: 'Payment Per Creditor'
+            }
         },
         series: [
-            {showInLegend: false, name:"Payouts", data: []}
+            {showInLegend: false, name:"Payment", data: []}
         ],
         title: {
-            text: 'Estate Payouts'
+            text: 'Ketubot Bankrupcy Scenario'
         },
         loading: false
     };
