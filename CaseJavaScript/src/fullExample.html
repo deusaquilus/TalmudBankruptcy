@@ -141,17 +141,17 @@
 
 <!--<div style="width:100vw">-->
 
-    <hbox valign="top" align="middle" style="width:100vw; border: 2px solid black">
+    <hbox valign="top" align="middle">
 
-        <hbox>
+        <hbox style="width: 50vw">
 
-            <div style="width:100%; display: inline-block">
-            <div ng-controller="PayoffChartControl">
+            <div>
+            <div ng-controller="PayoffChartControl" style="width: 50vw;">
                 <highchart id="chart1" config="chart"></highchart>
             </div>
 
-            <div ng-controller="SliderControl">
-                <slider id="claimantsSlider"
+            <div ng-controller="SliderControl" align="center">
+                <slider id="claimantsSlider" style="width: 75%"
                         value="data.numClaimants"
                         min="1" max="data.maxNumClaimants"
                         step="1" direction="horizontal">
@@ -159,32 +159,30 @@
             </div>
             </div>
 
-        <div ng-controller="SliderControl" style="border: 2px solid darkred; width: 10vw">
-            <slider id="estateSlider" style="border: 2px solid darkblue; width: 10px"
-                    value="data.estate"
-                    min="0" max="data.maxEstateSize()"
-                    step="1" direction="vertical">
-            </slider>
-        </div>
+            <div ng-controller="SliderControl">
+                <slider id="estateSlider" style="height: 300px"
+                        value="data.estate"
+                        min="0" max="data.maxEstateSize()"
+                        step="1" direction="vertical">
+                </slider>
+            </div>
         </hbox>
 
         <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
 
-        <div>
+        <div style="width: 50vw;">
 
             <div ng-controller="GridController">
-                <div class="gridStyle" ng-grid="gridOptions"></div>
+                <div class="gridStyle" ng-grid="gridOptions" style="width: 50vw;"></div>
             </div>
 
             <hbox>
-                <div>
+                <div ng-controller="ClaimantsEditorControl">
                     <label class="largeFont">Creditors</label>
-                    <input class="creditorsSpinner" size="4" type="number" ng-controller="ClaimantsEditorControl" ng-model="data.numClaimants"></input>
-                </div>
+                    <input class="creditorsSpinner" size="4" type="number" ng-model="data.numClaimants"></input>
 
-                <div>
                     <label class="largeFont">Estate</label>
-                    <input class="estateSpinner" size="4" type="number" ng-controller="ClaimantsEditorControl" ng-model="data.estate"></input>
+                    <input class="estateSpinner" size="4" type="number" ng-model="data.estate"></input>
                 </div>
             </hbox>
         </div>

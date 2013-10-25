@@ -86,7 +86,7 @@ app.factory('ClaimantsData', function(){
     return {
         estate: 300,
         numClaimants:3,
-        maxNumClaimants:20,
+        maxNumClaimants:10,
         fullClaimantsList: Engine.BankrupcyCaseWrapper.createClaimants(100, 100, 20),
         // we need a special array to keep track of the data since if claimants()
         // returns a differnet object every time (i.e. an array that represents a slice
