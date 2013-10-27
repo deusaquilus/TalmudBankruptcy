@@ -32,6 +32,16 @@ public class FillersTest {
 		Assert.assertEquals(expectedRemaining, round2(remaining));
 	}
 
+	@Test
+	public void fullScenarioBothSeriesTest() {
+		List<Claimant> claimants = Arrays.asList(new Claimant(100), new Claimant(200), new Claimant(300));
+		double remaining = BankrupcySolution.runScenario(claimants, 600);
+
+		for (Claimant claimant : claimants) {
+			System.out.println(claimant.getClaim() + ": " + claimant.getFirstPassPayout() + ", " + claimant.getSecondPassPayout());
+		}
+	}
+
 
 	public static void runFullScenarioTest(
 			double estateSize,

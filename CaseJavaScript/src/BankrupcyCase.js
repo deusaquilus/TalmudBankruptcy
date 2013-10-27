@@ -81,6 +81,12 @@ app.filter('round2', function(){
     }
 });
 
+app.factory('UIConfiguration', function() {
+    return {
+        isTwoPass: true
+    }
+});
+
 
 app.factory('ClaimantsData', function(){
     return {
@@ -107,8 +113,25 @@ app.factory('ClaimantsData', function(){
 
         payoutSeriesInternal:[],
         payoutSeries: function(){
-            clearArrayAndPopulateWith(this.payoutSeriesInternal, Engine.BankrupcyCaseWrapper.getPayouts(this.claimants()));
+            clearArrayAndPopulateWith(
+                this.payoutSeriesInternal,
+                Engine.BankrupcyCaseWrapper.getPayouts(this.claimants()));
             return this.payoutSeriesInternal;
+        },
+
+        firstPassSeriesInternal:[],
+        firstPassSeries: function() {
+            clearArrayAndPopulateWith(
+                this.firstPassSeriesInternal,
+                Engine.BankrupcyCaseWrapper.getFirstPassPayouts(this.claimants()));
+            return this.firstPassSeriesInternal;
+        },
+        secondPassSeriesInternal:[],
+        secondPassSeries: function() {
+            clearArrayAndPopulateWith(
+                this.secondPassSeriesInternal,
+                Engine.BankrupcyCaseWrapper.getSecondPassPayouts(this.claimants()));
+            return this.secondPassSeriesInternal;
         },
 
         categoriesInternal:[],
@@ -132,7 +155,9 @@ app.controller('GridController', function($scope, ClaimantsData) {
         columnDefs:[
             {field: 'name',displayName: 'Name', enableCellEdit: true},
             {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
-            {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'}
+            {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'},
+            {field: 'firstPassPayout',displayName: 'First Pass', cellTemplate: 'PayoffCellTemplate.html'},
+            {field: 'secondPassPayout',displayName: 'Second Pass', cellTemplate: 'PayoffCellTemplate.html'}
 
         ]
     };
@@ -144,57 +169,4 @@ function ClaimantsEditorControl($scope, ClaimantsData) {
 
 function SliderControl($scope, ClaimantsData) {
     $scope.data = ClaimantsData;
-}
-
-function PayoffChartControl($scope, ClaimantsData) {
-
-    $scope.data = ClaimantsData;
-
-    $scope.chart = {
-        options: {
-            chart: {
-                type: 'column'
-            }
-        },
-        xAxis: {
-            categories: []
-        },
-        yAxis: {
-            max: Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants()),
-            title: {
-                text: 'Payment Per Creditor'
-            }
-        },
-        series: [
-            {showInLegend: false, name:"Payment", data: []}
-        ],
-        title: {
-            text: 'Ketubot Bankrupcy Scenario'
-        },
-        loading: false
-    };
-
-    // watch the payout series (i.e. how much claimants are getting) and update the graph accordingly
-    $scope.$watch('data.payoutSeries()', function(){
-        var payoutSeriesArray = $scope.chart.series[0].data;
-        clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
-    }, true);
-
-    // watch the data categories i.e. claimant names and update accordingly
-    $scope.$watch('data.categories()', function(){
-        var categoriesArray = $scope.chart.xAxis.categories;
-        clearArrayAndPopulateWith(categoriesArray, ClaimantsData.categories());
-    }, true);
-
-    // watch the claimants and see if the claims have changed
-    $scope.$watch('data.claimants()', function(){
-        // and update the maximal estate size on the axis accordingly
-        $scope.chart.yAxis.max = Engine.BankrupcyCaseWrapper.getMaximalEstateClaimant(ClaimantsData.claimants());
-    }, true);
-
-
-    $scope.$watch('data.estate', function(){
-        var payoutSeriesArray = $scope.chart.series[0].data;
-        clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
-    }, true);
 }

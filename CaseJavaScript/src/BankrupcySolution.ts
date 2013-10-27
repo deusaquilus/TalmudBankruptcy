@@ -107,7 +107,7 @@ module Engine {
 
             // if the _estate has enough to pay them equally, do that... and then return amount of money left
             if (totalAccount >= totalRedeemAmount) {
-                this.redeemClaimantsEqually(claimants, redeemAmount, true);
+                this.redeemClaimantsEqually(claimants, redeemAmount, isFirstPass);
                 return (totalAccount - totalRedeemAmount);
             }
 

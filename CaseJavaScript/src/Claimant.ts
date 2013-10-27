@@ -65,8 +65,8 @@ module Engine {
             return this._secondPassPayout;
         }
 
-        public set secondPassPayout(firstPassPayout:number) {
-            this._secondPassPayout = Number(firstPassPayout);
+        public set secondPassPayout(secondPassPayout:number) {
+            this._secondPassPayout = Number(secondPassPayout);
         }
 
     }

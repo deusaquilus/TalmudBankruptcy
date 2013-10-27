@@ -6,7 +6,8 @@ app.directive("slider", function(){
             value:"=",
             min:"=",
             max:"=",
-            step:"="
+            step:"=",
+            tooltiptitle:"@" // for some reason all attributes are casted to lower case in angular
         },
 
         // you'l get a 'TypeError: undefined is not a function' if this isn't true & you use ng-transclude
@@ -26,14 +27,15 @@ app.directive("slider", function(){
             var firstDivElement = element;
 
 
+            var myPosition;
+            var atPosition;
 
             // apparantly this seems to work by setting in css doesn't although the jquery slider
             // control claims that that's possible
             if (attrs.direction === "vertical") {
-                // Don't put sizing constraints here because they could be broken with stuff
-                // like vw coordiantes and not appear at all. Use css somewhere to style this
-                //firstDivElement.height("100%");
-                //firstDivElement.width("5px");
+
+                myPosition = "left center";
+                atPosition = "right center";
 
                 firstDivElement.slider({
                     value: scope.value,
@@ -44,19 +46,12 @@ app.directive("slider", function(){
                     slide: function( event, ui ) {
                         // when the user adjusts the slider, update the value
                         scope.$apply("value=" + ui.value);
-
-                        //$('.qtip:visible').qtip('reposition');
-
                     }
                 });
-
-
             } else {
 
-                // Don't put sizing constraints here because they could be broken with stuff
-                // like vw coordiantes and not appear at all. Use css somewhere to style this
-                //firstDivElement.width("100%");
-                //firstDivElement.height("5px");
+                myPosition = "top center";
+                atPosition = "bottom center";
 
                 firstDivElement.slider({
                     value: scope.value,
@@ -74,9 +69,26 @@ app.directive("slider", function(){
             }
 
             var handle = firstDivElement.find("a");
-            var qtipInstance = handle.qtip();
+            var qtipInstance = handle.qtip({
+                    content: {
+                        title: {
+                            text: attrs.tooltiptitle
+                        },
+                        text: scope.value
+                    },
+                    position: {
+                        container: handle,
+                        my: myPosition,
+                        at: atPosition
+                    },
+                    show: true,
+                    hide: false,
+                    style: {
+                        width: 100
+                    }
+                });
 
-            //
+
             scope.$watch("value", function(newValue){
                 // when the value changes outside the slider, update the slider
                 firstDivElement.slider("value", newValue);
@@ -84,16 +96,16 @@ app.directive("slider", function(){
                 // TODO This is a lot of work to call a these every time something is moved
                 // see if we can move these things out into some other method and keep
                 // a boolean to make sure that it's changed the first time this field is used
-//                qtipInstance.qtip('option', 'content.text', newValue);
-//                qtipInstance.qtip('option', 'style.width', 60);
-//                qtipInstance.qtip('option', 'style.classes', "qtip-light");
+                qtipInstance.qtip('option', 'content.text', newValue);
+                //qtipInstance.qtip('option', 'style.width', 60);
+                //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
             scope.$watch("max", function(newValue){
                 firstDivElement.slider("option", "max", newValue);
-//                qtipInstance.qtip('option', 'content.text', newValue);
-//                qtipInstance.qtip('option', 'style.width', 60);
-//                qtipInstance.qtip('option', 'style.classes', "qtip-light");
+                qtipInstance.qtip('option', 'content.text', newValue);
+                //qtipInstance.qtip('option', 'style.width', 60);
+                //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
         },

@@ -101,7 +101,7 @@ public class BankrupcySolution {
 
 		// if the estate has enough to pay them equally, do that... and then return amount of money left
 		if (totalAccount >= totalRedeemAmount) {
-			redeemClaimantsEqually(claimants, redeemAmount, true);
+			redeemClaimantsEqually(claimants, redeemAmount, isFirstPass);
 			return (totalAccount - totalRedeemAmount);
 		}
 

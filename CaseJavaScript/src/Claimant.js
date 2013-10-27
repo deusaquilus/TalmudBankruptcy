@@ -83,8 +83,8 @@ var Engine;
             get: function () {
                 return this._secondPassPayout;
             },
-            set: function (firstPassPayout) {
-                this._secondPassPayout = Number(firstPassPayout);
+            set: function (secondPassPayout) {
+                this._secondPassPayout = Number(secondPassPayout);
             },
             enumerable: true,
             configurable: true

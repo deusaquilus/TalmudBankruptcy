@@ -97,7 +97,7 @@ var Engine;
             var totalRedeemAmount = redeemAmount * claimants.length;
 
             if (totalAccount >= totalRedeemAmount) {
-                this.redeemClaimantsEqually(claimants, redeemAmount, true);
+                this.redeemClaimantsEqually(claimants, redeemAmount, isFirstPass);
                 return (totalAccount - totalRedeemAmount);
             }
 

@@ -38,6 +38,8 @@
 
     <script type="text/javascript" src="directives/slider.js"></script>
 
+    <script type="text/javascript" src="controls/PayoffChartControl.js"></script>
+
 </head>
 <body>
 
@@ -109,29 +111,29 @@
     {
         // note that this will run before the angular setup
 
-        var handle = $('#estateSlider').find("a");
-        var qtipInstance = handle.qtip({
-            content: {
-                title: {
-                    text: "Estate Value"
-                },
-                text: 'Drag up and down to increase or decrease the value of the estate'
-            },
-            position: {
-                container: handle,
-                my: "left center",
-                at: "right center"
-            },
-            show: '',
-            hide: false,
-            style: {
-                width: 150
-            }
-        });
-
-        // show once on a page load, for some reason putting this into the 'show' function
-        // (i.e. show: 'ready' does not work becuase the qtip keeps reappearing)
-        qtipInstance.qtip('show');
+//        var handle = $('#estateSlider').find("a");
+//        var qtipInstance = handle.qtip({
+//            content: {
+//                title: {
+//                    text: "Estate Value"
+//                },
+//                text: 'Drag up and down to increase or decrease the value of the estate'
+//            },
+//            position: {
+//                container: handle,
+//                my: "left center",
+//                at: "right center"
+//            },
+//            show: '',
+//            hide: false,
+//            style: {
+//                width: 150
+//            }
+//        });
+//
+//        // show once on a page load, for some reason putting this into the 'show' function
+//        // (i.e. show: 'ready' does not work becuase the qtip keeps reappearing)
+//        qtipInstance.qtip('show');
 
 
     });
@@ -154,7 +156,8 @@
                 <slider id="claimantsSlider" style="width: 75%"
                         value="data.numClaimants"
                         min="1" max="data.maxNumClaimants"
-                        step="1" direction="horizontal">
+                        step="1" direction="horizontal"
+                        tooltiptitle="# Creditors">
                 </slider>
             </div>
             </div>
@@ -163,7 +166,8 @@
                 <slider id="estateSlider" style="height: 300px"
                         value="data.estate"
                         min="0" max="data.maxEstateSize()"
-                        step="1" direction="vertical">
+                        step="1" direction="vertical"
+                        tooltiptitle="$ Estate">
                 </slider>
             </div>
         </hbox>
