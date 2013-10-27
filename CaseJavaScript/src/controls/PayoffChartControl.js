@@ -54,7 +54,7 @@ app.factory('ChartControlService', function(){
 });
 
 
-app.factory('ChartColorService', function(){
+app.factory('ChartColorService', function(MiscUtil){
     var defaultColors = ['#2f7ed8', '#0d233a'];
 
     return {
@@ -64,12 +64,26 @@ app.factory('ChartColorService', function(){
                 return defaultColors.slice(0).reverse();
             }
             return defaultColors.slice(0);
+        },
+        formatToolTip: function(useHeader) {
+            var point = this;
+            var printedValue = MiscUtil.round2DollarValue(point.y);
+            var series = point.series;
+
+            return ['<span style="color:' + series.color + '">', (point.name || series.name), '</span>: ',
+                (!useHeader ? ('<b>x = ' + (point.name || point.x) + ',</b> ') : ''),
+                '<b>', (!useHeader ? 'y = ' : ''), printedValue, '</b>'].join('');
         }
     }
 });
 
 
-app.controller('PayoffChartControl', function($scope, ClaimantsData, UIConfiguration, ChartControlService, ChartColorService) {
+app.controller('PayoffChartControl', function(
+    $scope,
+    ClaimantsData,
+    UIConfiguration,
+    ChartControlService,
+    ChartColorService) {
 
     var initialSeries;
     if (UIConfiguration.isTwoPass) {
@@ -93,6 +107,10 @@ app.controller('PayoffChartControl', function($scope, ClaimantsData, UIConfigura
                 series: {
                     stacking: 'normal'
                 }
+            },
+            tooltip: {
+                formatter: ChartColorService.formatToolTip
+
             },
             colors: ChartColorService.getColorScheme(UIConfiguration.isTwoPass)
         },

@@ -74,19 +74,33 @@ app.directive("vbox", function(){
 });
 
 
-app.filter('round2', function(){
-    return function(value) {
-        var output = Math.round(value * 100) / 100;
-        return output;
+app.factory('MiscUtil', function(){
+    return {
+        round2DollarValue: function(value) {
+            var output = Math.round(value * 100) / 100;
+            return "$" + output;
+        }
     }
 });
 
 
-function CollapseCtrl($scope) {
+app.filter('round2DollarValueFilter', function(MiscUtil){
+    return function(value) {
+        return MiscUtil.round2DollarValue(value);
+    }
+});
+
+
+function CollapseCtrl($scope, MiscUtil) {
     $scope.collapseData = {
         isCollapsed: false,
         notCollapsed: function() {
             return this.isCollapsed;
+        }
+    };
+    $scope.util = {
+        dollarValuePrintingFunction: function(value) {
+            return MiscUtil.round2DollarValue(value);
         }
     };
 }
@@ -179,9 +193,4 @@ function ClaimantsEditorControl($scope, ClaimantsData) {
 
 function SliderControl($scope, ClaimantsData) {
     $scope.data = ClaimantsData;
-    $scope.util = {
-        estateValuePrintingFunction: function(value) {
-            return "$" + value;
-        }
-    };
 }
