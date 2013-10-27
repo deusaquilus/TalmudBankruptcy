@@ -158,8 +158,9 @@
 
 
 <!--<div style="width:100vw">-->
+    <div ng-controller="CollapseCtrl">
 
-    <hbox >
+    <hbox>
 
         <hbox style="width: 50vw">
 
@@ -173,7 +174,8 @@
                         value="data.numClaimants"
                         min="1" max="data.maxNumClaimants"
                         step="1" direction="horizontal"
-                        tooltiptitle="Creditors">
+                        tooltiptitle="Creditors"
+                        tooltipenabled="collapseData.notCollapsed()">
                 </slider>
             </div>
             </div>
@@ -184,17 +186,18 @@
                         min="0" max="data.maxEstateSize()"
                         step="1" direction="vertical"
                         tooltiptitle="Estate"
-                        tooltipprinter="util.estateValuePrintingFunction">
+                        tooltipprinter="util.estateValuePrintingFunction"
+                        tooltipenabled="collapseData.notCollapsed()">
                 </slider>
             </div>
         </hbox>
 
-        <div style="width: 50vw;" ng-controller="CollapseDemoCtrl">
+        <div style="width: 50vw;">
 
             <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
-            <button class="btn" ng-click="isCollapsed = !isCollapsed">Toggle collapse</button>
+            <button class="btn" ng-click="collapseData.isCollapsed = !collapseData.isCollapsed">Toggle collapse</button>
 
-            <div collapse="isCollapsed">
+            <div collapse="collapseData.isCollapsed">
                 <div ng-controller="GridController">
                     <div class="gridStyle" ng-grid="gridOptions" style="width: 50vw;"></div>
                 </div>
@@ -213,6 +216,7 @@
         </div>
     </hbox>
 
+    </div>
 
 <!--</div>-->
 

@@ -13,6 +13,9 @@ app.directive("slider", function(){
                 return toolTipPrinter(labelValue);
             }
             return labelValue;
+        },
+        trueIfUndefined: function(value) {
+            return (value == undefined) ? true : value;
         }
     };
 
@@ -27,7 +30,8 @@ app.directive("slider", function(){
             max:"=",
             step:"=",
             tooltiptitle:"@", // for some reason all attributes are casted to lower case in angular
-            tooltipprinter: "="
+            tooltipprinter: "=",
+            tooltipenabled: "="
         },
 
         // you'l get a 'TypeError: undefined is not a function' if this isn't true & you use ng-transclude
@@ -47,44 +51,29 @@ app.directive("slider", function(){
             // apparantly this seems to work by setting in css doesn't although the jquery slider
             // control claims that that's possible
             if (attrs.direction === "vertical") {
-
                 myPosition = "left center";
                 atPosition = "right center";
-
-                firstDivElement.slider({
-                    value: scope.value,
-                    min: scope.min,
-                    max: scope.max,
-                    step: scope.step,
-                    orientation:"vertical",
-                    slide: function( event, ui ) {
-                        // when the user adjusts the slider, update the value
-                        scope.$apply("value=" + ui.value);
-                    }
-                });
             } else {
-
                 myPosition = "top center";
                 atPosition = "bottom center";
-
-                firstDivElement.slider({
-                    value: scope.value,
-                    min: scope.min,
-                    max: scope.max,
-                    step: scope.step,
-                    orientation:"horizontal",
-                    slide: function( event, ui ) {
-                        // when the user adjusts the slider, update the value
-                        scope.$apply("value=" + ui.value);
-
-                        //$('.qtip:visible').qtip('reposition');
-
-                    }
-                });
             }
+
+            firstDivElement.slider({
+                value: scope.value,
+                min: scope.min,
+                max: scope.max,
+                step: scope.step,
+                orientation: attrs.direction,
+                slide: function( event, ui ) {
+                    // when the user adjusts the slider, update the value
+                    scope.$apply("value=" + ui.value);
+                }
+            });
 
             // setup a tooltip printer to use
             var toolTipPrinter = scope.tooltipprinter;
+
+            //var show = (scope.tooltipenabled != undefined) ? scope.tooltipenabled() : true;
 
             // get the handle to the slider drag control to paint the qtip on
             var handle = firstDivElement.find("a");
@@ -100,8 +89,8 @@ app.directive("slider", function(){
                         my: myPosition,
                         at: atPosition
                     },
-                    show: true,
-                    hide: false,
+                    show: sliderUtils.trueIfUndefined(scope.tooltipenabled),
+                    hide: !sliderUtils.trueIfUndefined(scope.tooltipenabled),
                     style: {
                         width: 75
                     }
@@ -125,6 +114,14 @@ app.directive("slider", function(){
                 qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
                 //qtipInstance.qtip('option', 'style.width', 60);
                 //qtipInstance.qtip('option', 'style.classes', "qtip-light");
+            });
+
+            scope.$watch("tooltipenabled", function(newValue){
+                if (sliderUtils.trueIfUndefined(scope.tooltipenabled)) {
+                    qtipInstance.qtip('show');
+                } else {
+                    qtipInstance.qtip('hide');
+                }
             });
 
         },

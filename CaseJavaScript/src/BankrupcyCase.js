@@ -82,8 +82,13 @@ app.filter('round2', function(){
 });
 
 
-function CollapseDemoCtrl($scope) {
-    $scope.isCollapsed = false;
+function CollapseCtrl($scope) {
+    $scope.collapseData = {
+        isCollapsed: false,
+        notCollapsed: function() {
+            return this.isCollapsed;
+        }
+    };
 }
 
 app.factory('UIConfiguration', function() {
@@ -178,5 +183,5 @@ function SliderControl($scope, ClaimantsData) {
         estateValuePrintingFunction: function(value) {
             return "$" + value;
         }
-    }
+    };
 }
