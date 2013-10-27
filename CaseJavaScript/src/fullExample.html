@@ -29,6 +29,10 @@
     <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
     <script src="../src/directives/highcharts-ng.js"></script>
 
+    <!-- Boostrap UI for the collapse panel -->
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
     <!-- Claimant data model (TODO what happens when they're loaded out of order) -->
     <script type="text/javascript" src="Claimant.js"></script>
     <script type="text/javascript" src="BankrupcySolution.js"></script>
@@ -39,6 +43,8 @@
     <script type="text/javascript" src="directives/slider.js"></script>
 
     <script type="text/javascript" src="controls/PayoffChartControl.js"></script>
+
+
 
 </head>
 <body>
@@ -80,9 +86,9 @@
         border-radius:5px;
     }
 
-    table, tr, td {
-        width: 100%;
-    }
+    /*table, tr, td {*/
+        /*width: 100%;*/
+    /*}*/
 
 
     /*.ui-slider-vertical .ui-slider-handle {*/
@@ -102,6 +108,16 @@
     /*.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {*/
         /*border-top-left-radius: 8px;*/
     /*}*/
+
+    /*table, tr, td {*/
+        /*border: 2px solid red;*/
+    /*}*/
+
+    /* This is to undo the bootstrap library settings which reset
+    the default style of labels to 'block' and breaks the display */
+    label {
+        display: inline-block;
+    }
 
 </style>
 
@@ -143,7 +159,7 @@
 
 <!--<div style="width:100vw">-->
 
-    <hbox valign="top" align="middle">
+    <hbox >
 
         <hbox style="width: 50vw">
 
@@ -157,7 +173,7 @@
                         value="data.numClaimants"
                         min="1" max="data.maxNumClaimants"
                         step="1" direction="horizontal"
-                        tooltiptitle="# Creditors">
+                        tooltiptitle="Creditors">
                 </slider>
             </div>
             </div>
@@ -167,28 +183,33 @@
                         value="data.estate"
                         min="0" max="data.maxEstateSize()"
                         step="1" direction="vertical"
-                        tooltiptitle="$ Estate">
+                        tooltiptitle="Estate"
+                        tooltipprinter="util.estateValuePrintingFunction">
                 </slider>
             </div>
         </hbox>
 
-        <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
+        <div style="width: 50vw;" ng-controller="CollapseDemoCtrl">
 
-        <div style="width: 50vw;">
+            <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
+            <button class="btn" ng-click="isCollapsed = !isCollapsed">Toggle collapse</button>
 
-            <div ng-controller="GridController">
-                <div class="gridStyle" ng-grid="gridOptions" style="width: 50vw;"></div>
-            </div>
-
-            <hbox>
-                <div ng-controller="ClaimantsEditorControl">
-                    <label class="largeFont">Creditors</label>
-                    <input class="creditorsSpinner" size="4" type="number" ng-model="data.numClaimants"></input>
-
-                    <label class="largeFont">Estate</label>
-                    <input class="estateSpinner" size="4" type="number" ng-model="data.estate"></input>
+            <div collapse="isCollapsed">
+                <div ng-controller="GridController">
+                    <div class="gridStyle" ng-grid="gridOptions" style="width: 50vw;"></div>
                 </div>
-            </hbox>
+
+                <hbox>
+                    <div ng-controller="ClaimantsEditorControl">
+                        <label class="largeFont">Creditors</label>
+                        <input class="creditorsSpinner" size="4" type="number" ng-model="data.numClaimants"></input>
+                    </div>
+                    <div ng-controller="ClaimantsEditorControl">
+                        <label class="largeFont" style="vertical-align: middle">Estate</label>
+                        <input class="estateSpinner" size="4" type="number" ng-model="data.estate"></input>
+                    </div>
+                </hbox>
+            </div>
         </div>
     </hbox>
 

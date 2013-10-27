@@ -1,5 +1,24 @@
 app.directive("slider", function(){
 
+    var sliderUtils = {
+        verifyValidOrientation: function(orientation) {
+            // using attrs for direction because for some reason '=' scope does not seem to work of strings
+            // (i.e they become 'undefined') so instead we'll just do it like this...
+            if (orientation != "vertical" && orientation != "horizontal") {
+                throw new Error("orientation of the slider must be either vertical or horizontal");
+            }
+        },
+        printToolTipLabel: function(toolTipPrinter, labelValue) {
+            if (toolTipPrinter != undefined) {
+                return toolTipPrinter(labelValue);
+            }
+            return labelValue;
+        }
+    };
+
+
+
+
     return {
         restrict:"E",
         scope: {
@@ -7,7 +26,8 @@ app.directive("slider", function(){
             min:"=",
             max:"=",
             step:"=",
-            tooltiptitle:"@" // for some reason all attributes are casted to lower case in angular
+            tooltiptitle:"@", // for some reason all attributes are casted to lower case in angular
+            tooltipprinter: "="
         },
 
         // you'l get a 'TypeError: undefined is not a function' if this isn't true & you use ng-transclude
@@ -17,15 +37,9 @@ app.directive("slider", function(){
 
         link: function(scope, element, attrs) {
 
-//            // using attrs for direction because for some reason '=' scope does not seem to work of strings
-//            // (i.e they become 'undefined') so instead we'll just do it like this...
-//            var direction = attrs.direction;
-//            if (direction != "vertical" && direction != "horizontal") {
-//                throw new Error("orientation of the slider must be either vertical or horizontal");
-//            }
-//
-            var firstDivElement = element;
+            sliderUtils.verifyValidOrientation(attrs.direction);
 
+            var firstDivElement = element;
 
             var myPosition;
             var atPosition;
@@ -58,6 +72,7 @@ app.directive("slider", function(){
                     min: scope.min,
                     max: scope.max,
                     step: scope.step,
+                    orientation:"horizontal",
                     slide: function( event, ui ) {
                         // when the user adjusts the slider, update the value
                         scope.$apply("value=" + ui.value);
@@ -68,13 +83,17 @@ app.directive("slider", function(){
                 });
             }
 
+            // setup a tooltip printer to use
+            var toolTipPrinter = scope.tooltipprinter;
+
+            // get the handle to the slider drag control to paint the qtip on
             var handle = firstDivElement.find("a");
             var qtipInstance = handle.qtip({
                     content: {
                         title: {
                             text: attrs.tooltiptitle
                         },
-                        text: scope.value
+                        text: sliderUtils.printToolTipLabel(toolTipPrinter, scope.value)
                     },
                     position: {
                         container: handle,
@@ -84,7 +103,7 @@ app.directive("slider", function(){
                     show: true,
                     hide: false,
                     style: {
-                        width: 100
+                        width: 75
                     }
                 });
 
@@ -96,14 +115,14 @@ app.directive("slider", function(){
                 // TODO This is a lot of work to call a these every time something is moved
                 // see if we can move these things out into some other method and keep
                 // a boolean to make sure that it's changed the first time this field is used
-                qtipInstance.qtip('option', 'content.text', newValue);
+                qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
                 //qtipInstance.qtip('option', 'style.width', 60);
                 //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
             scope.$watch("max", function(newValue){
                 firstDivElement.slider("option", "max", newValue);
-                qtipInstance.qtip('option', 'content.text', newValue);
+                qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
                 //qtipInstance.qtip('option', 'style.width', 60);
                 //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });

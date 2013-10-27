@@ -118,12 +118,6 @@ app.controller('PayoffChartControl', function($scope, ClaimantsData, UIConfigura
         ChartControlService.watchOnePassPaymentSeries($scope, ClaimantsData);
     }
 
-    // watch the payout series (i.e. how much claimants are getting) and update the graph accordingly
-//    $scope.$watch('data.payoutSeries()', function(){
-//        var payoutSeriesArray = $scope.chart.series[0].data;
-//        clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
-//    }, true);
-
     // watch the data categories i.e. claimant names and update accordingly
     $scope.$watch('data.categories()', function(){
         var categoriesArray = $scope.chart.xAxis.categories;

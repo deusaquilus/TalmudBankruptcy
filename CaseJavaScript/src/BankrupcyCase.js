@@ -2,7 +2,7 @@
  * Created by aioffe on 10/22/13.
  */
 
-var app = angular.module('myApp', ['ngGrid', "highcharts-ng"]);
+var app = angular.module('myApp', ['ngGrid', "highcharts-ng", 'ui.bootstrap']);
 
 function clearArrayAndPopulateWith(array, populateWith) {
     array.length = 0;
@@ -80,6 +80,11 @@ app.filter('round2', function(){
         return output;
     }
 });
+
+
+function CollapseDemoCtrl($scope) {
+    $scope.isCollapsed = false;
+}
 
 app.factory('UIConfiguration', function() {
     return {
@@ -169,4 +174,9 @@ function ClaimantsEditorControl($scope, ClaimantsData) {
 
 function SliderControl($scope, ClaimantsData) {
     $scope.data = ClaimantsData;
+    $scope.util = {
+        estateValuePrintingFunction: function(value) {
+            return "$" + value;
+        }
+    }
 }
