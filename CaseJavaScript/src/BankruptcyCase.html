@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="utf-8">
+    <title>Talmudic Bankrupcy Algorithm Visualization</title>
+
+    <link rel="stylesheet" type="text/css" href="http://angular-ui.github.com/ng-grid/css/ng-grid.css" />
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+
+    <!-- Looks like jquery needs to be loaded before angular for things to work. -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.css" />
+
+    <!-- Using jquery ui for the sliders -->
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
+
+    <script type="text/javascript" src="http://angular-ui.github.com/ng-grid/lib/ng-grid.min.js"></script>
+
+    <!-- Doesn't look like including it explicitly is needed -->
+    <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
+
+    <!-- Highcharts directive for angular -->
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script src="../src/directives/highcharts-ng.js"></script>
+
+    <!-- Boostrap UI for the collapse panel -->
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+    <!-- Claimant data model (TODO what happens when they're loaded out of order) -->
+    <script type="text/javascript" src="Claimant.js"></script>
+    <script type="text/javascript" src="BankruptcySolution.js"></script>
+    <script type="text/javascript" src="BankruptcyCaseUtils.js"></script>
+
+    <script type="text/javascript" src="BankruptcyCase.js"></script>
+
+    <script type="text/javascript" src="directives/slider.js"></script>
+
+    <script type="text/javascript" src="controls/PayoffChartControl.js"></script>
+
+
+
+</head>
+<body>
+
+<style type="text/css">
+
+    .gridStyle {
+        border: 1px solid rgb(212,212,212);
+        width: 400px;
+        height: 300px;
+    }
+
+    .largeLabel {
+        font-size:1.15em;
+        margin-left:20px;
+        margin-right:5px
+    }
+
+    .creditorsSpinner {
+        font-size:1em;
+        width:3em;
+        padding:2px;
+        margin:0;
+        border:1px solid #ddd;
+        border-radius:5px;
+
+    }
+
+    .estateSpinner {
+        font-size:1em;
+        width:6em;
+        padding:2px;
+        border:1px solid #ddd;
+        border-radius:5px;
+    }
+
+    .headingStyle {
+        font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: #274b6d;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .custombtn {
+        padding: 4px;
+    }
+
+    label {
+        display: inline-block;
+    }
+
+</style>
+
+
+    <div ng-controller="GlobalApplicationControl">
+
+    <hbox valign="top">
+
+        <hbox style="width: 50vw; min-height: 470px;">
+
+            <div>
+            <div ng-controller="PayoffChartControl" style="width: 50vw; margin-top: 5px; min-height: 410px">
+                <highchart id="chart1" config="chart"></highchart>
+            </div>
+
+            <div ng-controller="SliderControl" align="center">
+                <slider id="claimantsSlider" style="width: 75%"
+                        value="data.numClaimants"
+                        min="1" max="data.maxNumClaimants"
+                        step="1" direction="horizontal"
+                        tooltiptitle="Creditors"
+                        tooltipenabled="collapseData.notCollapsed()"
+                        tooltipsize="77">
+                </slider>
+            </div>
+            </div>
+
+            <div ng-controller="SliderControl">
+                <slider id="estateSlider" style="height: 275px"
+                        value="data.estate"
+                        min="0" max="data.maxEstateSize()"
+                        step="util.getSnapAmount()" direction="vertical"
+                        tooltiptitle="Estate"
+                        tooltipprinter="util.dollarValuePrintingFunction"
+                        tooltipenabled="collapseData.notCollapsed()"
+                        tooltipsize="57">
+                </slider>
+            </div>
+        </hbox>
+
+        <div style="width: 45vw; min-height: 400px; margin-left: 5px;">
+
+            <div collapse="collapseData.isCollapsed">
+
+                <span class="headingStyle">Creditors and Payments:</span>
+
+                <div ng-controller="GridController">
+                    <div class="gridStyle" ng-grid="gridOptions" style="width: 45vw; min-height: 310px"></div>
+                </div>
+
+                <hbox>
+                    <div ng-controller="ClaimantsEditorControl">
+                        <hbox style="margin-top: 10px">
+                        <label class="largeLabel">Creditors: </label>
+                        <input class="creditorsSpinner"
+                               ng-keypress="util.validateControl($event)"
+                               min="1" max="10" size="4" type="number" ng-model="data.numClaimants"></input>
+                        </hbox>
+                    </div>
+                    <div ng-controller="ClaimantsEditorControl">
+                        <hbox style="margin-top: 10px">
+                        <label class="largeLabel">Estate: </label>
+                        <input class="estateSpinner"
+                               ng-keypress="util.validateControl($event)"
+                               min="0" size="4" type="number" ng-model="data.estate"></input>
+                        </hbox>
+                    </div>
+                    <div>
+                        <label class="largeLabel">Step by Five</label>
+                        <input type="checkbox" ng-model="util.snapByFive"></input>
+                    </div>
+                </hbox>
+            </div>
+
+            <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
+            <a href="" style="margin-top: 10px" class="btn custombtn" ng-click="collapseData.isCollapsed = !collapseData.isCollapsed">
+                <img src="../resources/{{collapseData.isCollapsed ? 'cog_add.png' : 'cog_delete.png'}}"></img>
+                {{collapseData.isCollapsed ? 'More Toys' : 'Less Toys'}}
+            </a>
+        </div>
+    </hbox>
+
+    </div>
+
+<!--</div>-->
+
+</body>
+</html>
