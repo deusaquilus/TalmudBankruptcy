@@ -93,7 +93,7 @@ app.filter('round2DollarValueFilter', function(MiscUtil){
 });
 
 
-function CollapseCtrl($scope, MiscUtil) {
+function GlobalApplicationControl($scope, MiscUtil) {
     $scope.collapseData = {
         isCollapsed: false,
         notCollapsed: function() {
