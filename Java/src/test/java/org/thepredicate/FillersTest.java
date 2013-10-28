@@ -1,6 +1,8 @@
 package org.thepredicate;
 
+import static org.thepredicate.Utils.getFirstPassPayouts;
 import static org.thepredicate.Utils.getPayouts;
+import static org.thepredicate.Utils.getSecondPassPayouts;
 import static org.thepredicate.Utils.round2;
 import static org.thepredicate.Utils.roundDoubles;
 
@@ -37,9 +39,10 @@ public class FillersTest {
 		List<Claimant> claimants = Arrays.asList(new Claimant(100), new Claimant(200), new Claimant(300));
 		double remaining = BankrupcySolution.runScenario(claimants, 600);
 
-		for (Claimant claimant : claimants) {
-			System.out.println(claimant.getClaim() + ": " + claimant.getFirstPassPayout() + ", " + claimant.getSecondPassPayout());
-		}
+		Assert.assertEquals(0d, round2(remaining));
+
+		Assert.assertEquals(Arrays.asList(50d, 100d, 150d), roundDoubles(getFirstPassPayouts(claimants)));
+		Assert.assertEquals(Arrays.asList(50d, 100d, 150d), roundDoubles(getSecondPassPayouts(claimants)));
 	}
 
 
