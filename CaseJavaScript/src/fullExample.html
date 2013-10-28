@@ -10,7 +10,7 @@
 
     <!-- Looks like jquery needs to be loaded before angular for things to work. -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>
 
     <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.js"></script>
 
@@ -57,15 +57,10 @@
         height: 300px;
     }
 
-    .expand {
-        width: 100%;
-        height: 100%;
-        margin-left:40px;
-    }
-
-    .largeFont {
-        font-size:1.1em;
-        margin-left:10px;
+    .largeLabel {
+        font-size:1.15em;
+        margin-left:20px;
+        margin-right:5px
     }
 
     .creditorsSpinner {
@@ -86,9 +81,24 @@
         border-radius:5px;
     }
 
-    /*table, tr, td {*/
-        /*width: 100%;*/
-    /*}*/
+    .headingStyle {
+        font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: #274b6d;
+        width: 100%;
+        text-align: center;
+        display: inline-block;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .custombtn {
+        padding: 4px;
+    }
+
+    .ui-tooltip-content {
+        text-align: center;
+    }
 
 
     /*.ui-slider-vertical .ui-slider-handle {*/
@@ -160,12 +170,12 @@
 <!--<div style="width:100vw">-->
     <div ng-controller="CollapseCtrl">
 
-    <hbox>
+    <hbox valign="top">
 
-        <hbox style="width: 50vw">
+        <hbox style="width: 50vw; min-height: 470px;">
 
             <div>
-            <div ng-controller="PayoffChartControl" style="width: 50vw;">
+            <div ng-controller="PayoffChartControl" style="width: 50vw; margin-top: 5px; min-height: 410px">
                 <highchart id="chart1" config="chart"></highchart>
             </div>
 
@@ -175,44 +185,64 @@
                         min="1" max="data.maxNumClaimants"
                         step="1" direction="horizontal"
                         tooltiptitle="Creditors"
-                        tooltipenabled="collapseData.notCollapsed()">
+                        tooltipenabled="collapseData.notCollapsed()"
+                        tooltipsize="77">
                 </slider>
             </div>
             </div>
 
             <div ng-controller="SliderControl">
-                <slider id="estateSlider" style="height: 300px"
+                <slider id="estateSlider" style="height: 275px"
                         value="data.estate"
                         min="0" max="data.maxEstateSize()"
-                        step="1" direction="vertical"
+                        step="util.getSnapAmount()" direction="vertical"
                         tooltiptitle="Estate"
                         tooltipprinter="util.dollarValuePrintingFunction"
-                        tooltipenabled="collapseData.notCollapsed()">
+                        tooltipenabled="collapseData.notCollapsed()"
+                        tooltipsize="57">
                 </slider>
             </div>
         </hbox>
 
-        <div style="width: 50vw;">
-
-            <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
-            <button class="btn" ng-click="collapseData.isCollapsed = !collapseData.isCollapsed">Toggle collapse</button>
+        <div style="width: 45vw; min-height: 400px; margin-left: 5px;">
 
             <div collapse="collapseData.isCollapsed">
+
+                <span class="headingStyle">Creditors and Payments:</span>
+
                 <div ng-controller="GridController">
-                    <div class="gridStyle" ng-grid="gridOptions" style="width: 50vw;"></div>
+                    <div class="gridStyle" ng-grid="gridOptions" style="width: 45vw; min-height: 310px"></div>
                 </div>
 
                 <hbox>
                     <div ng-controller="ClaimantsEditorControl">
-                        <label class="largeFont">Creditors</label>
-                        <input class="creditorsSpinner" size="4" type="number" ng-model="data.numClaimants"></input>
+                        <hbox style="margin-top: 10px">
+                        <label class="largeLabel">Creditors: </label>
+                        <input class="creditorsSpinner"
+                               ng-keypress="util.validateControl($event)"
+                               min="1" max="10" size="4" type="number" ng-model="data.numClaimants"></input>
+                        </hbox>
                     </div>
                     <div ng-controller="ClaimantsEditorControl">
-                        <label class="largeFont" style="vertical-align: middle">Estate</label>
-                        <input class="estateSpinner" size="4" type="number" ng-model="data.estate"></input>
+                        <hbox style="margin-top: 10px">
+                        <label class="largeLabel">Estate: </label>
+                        <input class="estateSpinner"
+                               ng-keypress="util.validateControl($event)"
+                               min="0" size="4" type="number" ng-model="data.estate"></input>
+                        </hbox>
+                    </div>
+                    <div>
+                        <label class="largeLabel">Step by Five</label>
+                        <input type="checkbox" ng-model="util.snapByFive"></input>
                     </div>
                 </hbox>
             </div>
+
+            <!-- Cant put the SliderControl directly on the hslider since both ask for isolated scope-->
+            <a href="#" style="margin-top: 10px" class="btn custombtn" ng-click="collapseData.isCollapsed = !collapseData.isCollapsed">
+                <img src="../resources/{{collapseData.isCollapsed ? 'cog_add.png' : 'cog_delete.png'}}"></img>
+                {{collapseData.isCollapsed ? 'More Detail' : 'Less Detail'}}
+            </a>
         </div>
     </hbox>
 

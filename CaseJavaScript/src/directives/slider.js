@@ -31,7 +31,8 @@ app.directive("slider", function(){
             step:"=",
             tooltiptitle:"@", // for some reason all attributes are casted to lower case in angular
             tooltipprinter: "=",
-            tooltipenabled: "="
+            tooltipenabled: "=",
+            tooltipsize: "="
         },
 
         // you'l get a 'TypeError: undefined is not a function' if this isn't true & you use ng-transclude
@@ -92,7 +93,9 @@ app.directive("slider", function(){
                     show: sliderUtils.trueIfUndefined(scope.tooltipenabled),
                     hide: !sliderUtils.trueIfUndefined(scope.tooltipenabled),
                     style: {
-                        width: 75
+                        width: scope.tooltipsize,
+                        classes: 'qtip-light qtip-rounded',
+                        textAlign: 'center'
                     }
                 });
 
@@ -114,6 +117,10 @@ app.directive("slider", function(){
                 qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
                 //qtipInstance.qtip('option', 'style.width', 60);
                 //qtipInstance.qtip('option', 'style.classes', "qtip-light");
+            });
+
+            scope.$watch("step", function(newValue){
+                firstDivElement.slider("option", "step", newValue);
             });
 
             scope.$watch("tooltipenabled", function(newValue){

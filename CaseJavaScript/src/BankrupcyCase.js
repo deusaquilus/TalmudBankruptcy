@@ -2,7 +2,9 @@
  * Created by aioffe on 10/22/13.
  */
 
-var app = angular.module('myApp', ['ngGrid', "highcharts-ng", 'ui.bootstrap']);
+var app = angular.module('myApp', ['ngGrid', "highcharts-ng", 'ui.bootstrap'],function($locationProvider) {
+    $locationProvider.html5Mode(true);
+});
 
 function clearArrayAndPopulateWith(array, populateWith) {
     array.length = 0;
@@ -101,13 +103,26 @@ function CollapseCtrl($scope, MiscUtil) {
     $scope.util = {
         dollarValuePrintingFunction: function(value) {
             return MiscUtil.round2DollarValue(value);
+        },
+        validateControl:function(theEvent) {
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode( key );
+            var regex = /[0-9]|\./;
+            if( !regex.test(key) ) {
+                theEvent.returnValue = false;
+                if(theEvent.preventDefault) theEvent.preventDefault();
+            }
+        },
+        snapByFive: true,
+        getSnapAmount: function() {
+            return (this.snapByFive ? 5 : 1);
         }
     };
 }
 
-app.factory('UIConfiguration', function() {
+app.factory('UIConfiguration', function($location) {
     return {
-        isTwoPass: true
+        isTwoPass: ($location.search()['twopass'] != undefined)
     }
 });
 
@@ -169,21 +184,27 @@ app.factory('ClaimantsData', function(){
     };
 });
 
-app.controller('GridController', function($scope, ClaimantsData) {
+app.controller('GridController', function($scope, ClaimantsData, UIConfiguration) {
     $scope.data = ClaimantsData;
+
+    var columnDefs = [
+        {field: 'name',displayName: 'Name', enableCellEdit: true},
+        {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
+        {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'}
+    ];
+
+    // if this is a 2-pass visualization, add the additional fields
+    if (UIConfiguration.isTwoPass) {
+        columnDefs.push({field: 'firstPassPayout',displayName: '1st Pass', cellTemplate: 'PayoffCellTemplate.html'});
+        columnDefs.push({field: 'secondPassPayout',displayName: '2nd Pass', cellTemplate: 'PayoffCellTemplate.html'});
+    }
+
     $scope.gridOptions = {
         data: 'data.claimants()',
         enableCellSelection: true,
         enableCellEdit: true,
         enableRowSelection: false,
-        columnDefs:[
-            {field: 'name',displayName: 'Name', enableCellEdit: true},
-            {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
-            {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'},
-            {field: 'firstPassPayout',displayName: 'First Pass', cellTemplate: 'PayoffCellTemplate.html'},
-            {field: 'secondPassPayout',displayName: 'Second Pass', cellTemplate: 'PayoffCellTemplate.html'}
-
-        ]
+        columnDefs: columnDefs
     };
 });
 

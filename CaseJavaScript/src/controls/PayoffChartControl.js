@@ -17,7 +17,7 @@ app.factory('ChartControlService', function(){
                 clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
             }, true);
             myScope.$watch('data.estate', function(){
-                var payoutSeriesArray = $scope.chart.series[0].data;
+                var payoutSeriesArray = myScope.chart.series[0].data;
                 clearArrayAndPopulateWith(payoutSeriesArray, ClaimantsData.payoutSeries());
             }, true);
         },
