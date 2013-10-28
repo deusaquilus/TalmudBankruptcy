@@ -90,6 +90,9 @@ app.directive("slider", function(){
                         my: myPosition,
                         at: atPosition
                     },
+                    // note that we want the initial values to the qtip function to disable it so that it
+                    // never pops up by accident when we don't want it to show, otherwise you get some strange
+                    // behavior when the qtip shows when it shouldn't
                     show: false,
                     hide: true,
                     style: {
@@ -100,23 +103,16 @@ app.directive("slider", function(){
                 });
 
 
+            // watch functions on scope changes that need to update the slider and qtip
             scope.$watch("value", function(newValue){
                 // when the value changes outside the slider, update the slider
                 firstDivElement.slider("value", newValue);
-
-                // TODO This is a lot of work to call a these every time something is moved
-                // see if we can move these things out into some other method and keep
-                // a boolean to make sure that it's changed the first time this field is used
                 qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
-                //qtipInstance.qtip('option', 'style.width', 60);
-                //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
             scope.$watch("max", function(newValue){
                 firstDivElement.slider("option", "max", newValue);
                 qtipInstance.qtip('option', 'content.text', sliderUtils.printToolTipLabel(toolTipPrinter, scope.value));
-                //qtipInstance.qtip('option', 'style.width', 60);
-                //qtipInstance.qtip('option', 'style.classes', "qtip-light");
             });
 
             scope.$watch("step", function(newValue){
