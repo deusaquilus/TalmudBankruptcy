@@ -9,28 +9,28 @@
 
 
     <!-- Looks like jquery needs to be loaded before angular for things to work. -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
 
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.css" />
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.css" />
 
     <!-- Using jquery ui for the sliders -->
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
 
 
-    <script type="text/javascript" src="http://angular-ui.github.com/ng-grid/lib/ng-grid.debug.js"></script>
+    <script type="text/javascript" src="http://angular-ui.github.com/ng-grid/lib/ng-grid.min.js"></script>
 
     <!-- Doesn't look like including it explicitly is needed -->
     <!--<script src="http://code.highcharts.com/highcharts.js"></script>-->
 
     <!-- Highcharts directive for angular -->
-    <script src="http://code.highcharts.com/stock/highstock.src.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
     <script src="../src/directives/highcharts-ng.js"></script>
 
     <!-- Boostrap UI for the collapse panel -->
-    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.min.js"></script>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
 
     <!-- Claimant data model (TODO what happens when they're loaded out of order) -->
@@ -96,78 +96,13 @@
         padding: 4px;
     }
 
-    .ui-tooltip-content {
-        text-align: center;
-    }
-
-
-    /*.ui-slider-vertical .ui-slider-handle {*/
-        /*left: -.45em;*/
-        /*height: 1.2em;*/
-    /*}*/
-
-    /*.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {*/
-        /*border-bottom-right-radius: 8px;*/
-    /*}*/
-    /*.ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl {*/
-        /*border-bottom-left-radius: 8px;*/
-    /*}*/
-    /*.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr {*/
-        /*border-top-right-radius: 8px;*/
-    /*}*/
-    /*.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {*/
-        /*border-top-left-radius: 8px;*/
-    /*}*/
-
-    /*table, tr, td {*/
-        /*border: 2px solid red;*/
-    /*}*/
-
-    /* This is to undo the bootstrap library settings which reset
-    the default style of labels to 'block' and breaks the display */
     label {
         display: inline-block;
     }
 
 </style>
 
-<script type="text/javascript">
 
-    $(document).ready(function()
-    {
-        // note that this will run before the angular setup
-
-//        var handle = $('#estateSlider').find("a");
-//        var qtipInstance = handle.qtip({
-//            content: {
-//                title: {
-//                    text: "Estate Value"
-//                },
-//                text: 'Drag up and down to increase or decrease the value of the estate'
-//            },
-//            position: {
-//                container: handle,
-//                my: "left center",
-//                at: "right center"
-//            },
-//            show: '',
-//            hide: false,
-//            style: {
-//                width: 150
-//            }
-//        });
-//
-//        // show once on a page load, for some reason putting this into the 'show' function
-//        // (i.e. show: 'ready' does not work becuase the qtip keeps reappearing)
-//        qtipInstance.qtip('show');
-
-
-    });
-
-</script>
-
-
-<!--<div style="width:100vw">-->
     <div ng-controller="GlobalApplicationControl">
 
     <hbox valign="top">
