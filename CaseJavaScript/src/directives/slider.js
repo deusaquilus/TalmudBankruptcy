@@ -90,8 +90,8 @@ app.directive("slider", function(){
                         my: myPosition,
                         at: atPosition
                     },
-                    show: sliderUtils.trueIfUndefined(scope.tooltipenabled),
-                    hide: !sliderUtils.trueIfUndefined(scope.tooltipenabled),
+                    show: false,
+                    hide: true,
                     style: {
                         width: scope.tooltipsize,
                         classes: 'qtip-light qtip-rounded',
