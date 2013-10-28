@@ -27,27 +27,7 @@ app.directive("hbox", function(){
 
             var jq = angular.element;
             var tableElementsJal = element.children().children().children();
-
-
-//            var rowJal = jq("<tr></tr>");
-//
-//            if (valign != undefined) {
-//                rowJal.css("vertical-align: " + valign);
-//
-//            }
-            // TODO see if this works for text, doesn't seem to work or controls yet
-//            if (align != undefined) {
-//                table.attr("align", align);
-//            }
             tableElementsJal.wrap("<td></td>");
-
-
-
-            // append the row to the table
-            //table.append(row);
-
-            // remove the dummy inner div from the table
-            //div.remove();
         },
         template: '<table><tr ng-transclude></tr></table>'
     }
