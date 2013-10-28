@@ -2,7 +2,7 @@
  * Created by aioffe on 10/16/13.
  */
 /// <reference path="./Claimant.ts" />
-/// <reference path="./BankrupcySolution.ts" />
+/// <reference path="./BankruptcySolution.ts" />
 module Engine {
     export class BankrupcyCaseWrapper {
 

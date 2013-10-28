@@ -2,7 +2,7 @@
 * Created by aioffe on 10/16/13.
 */
 /// <reference path="./Claimant.ts" />
-/// <reference path="./BankrupcySolution.ts" />
+/// <reference path="./BankruptcySolution.ts" />
 var Engine;
 (function (Engine) {
     var BankrupcyCaseWrapper = (function () {
@@ -103,4 +103,4 @@ var Engine;
     })();
     Engine.BankrupcyCaseWrapper = BankrupcyCaseWrapper;
 })(Engine || (Engine = {}));
-//# sourceMappingURL=BankrupcyCaseUtils.js.map
+//# sourceMappingURL=BankruptcyCaseUtils.js.map

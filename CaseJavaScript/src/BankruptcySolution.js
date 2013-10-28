@@ -121,4 +121,4 @@ var Engine;
     })();
     Engine.BankrupcySolution = BankrupcySolution;
 })(Engine || (Engine = {}));
-//# sourceMappingURL=BankrupcySolution.js.map
+//# sourceMappingURL=BankruptcySolution.js.map
