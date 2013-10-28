@@ -172,13 +172,13 @@ app.controller('GridController', function($scope, ClaimantsData, InputParameters
     var columnDefs = [
         {field: 'name',displayName: 'Name', enableCellEdit: true},
         {field:'claim', displayName:'Claim', enableCellEdit: true, editableCellTemplate: 'CellTemplate.html'},
-        {field: 'payout',displayName: 'Payout', cellTemplate: 'PayoffCellTemplate.html'}
+        {field: 'payout',displayName: 'Payout', enableCellEdit: false, cellTemplate: 'PayoffCellTemplate.html'}
     ];
 
     // if this is a 2-pass visualization, add the additional fields
     if (InputParameters.isTwoPass) {
-        columnDefs.push({field: 'firstPassPayout',displayName: '1st Pass', cellTemplate: 'PayoffCellTemplate.html'});
-        columnDefs.push({field: 'secondPassPayout',displayName: '2nd Pass', cellTemplate: 'PayoffCellTemplate.html'});
+        columnDefs.push({field: 'firstPassPayout',displayName: '1st Pass', enableCellEdit: false, cellTemplate: 'PayoffCellTemplate.html'});
+        columnDefs.push({field: 'secondPassPayout',displayName: '2nd Pass', enableCellEdit: false, cellTemplate: 'PayoffCellTemplate.html'});
     }
 
     $scope.gridOptions = {
