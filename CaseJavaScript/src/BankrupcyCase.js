@@ -120,9 +120,10 @@ function CollapseCtrl($scope, MiscUtil) {
     };
 }
 
-app.factory('UIConfiguration', function($location) {
+app.factory('InputParameters', function($location) {
     return {
-        isTwoPass: ($location.search()['twopass'] != undefined)
+        isTwoPass: ($location.search()['twopass'] != undefined),
+        showdetails: ($location.search()['showdetails'] != undefined)
     }
 });
 
@@ -184,7 +185,7 @@ app.factory('ClaimantsData', function(){
     };
 });
 
-app.controller('GridController', function($scope, ClaimantsData, UIConfiguration) {
+app.controller('GridController', function($scope, ClaimantsData, InputParameters) {
     $scope.data = ClaimantsData;
 
     var columnDefs = [
@@ -194,7 +195,7 @@ app.controller('GridController', function($scope, ClaimantsData, UIConfiguration
     ];
 
     // if this is a 2-pass visualization, add the additional fields
-    if (UIConfiguration.isTwoPass) {
+    if (InputParameters.isTwoPass) {
         columnDefs.push({field: 'firstPassPayout',displayName: '1st Pass', cellTemplate: 'PayoffCellTemplate.html'});
         columnDefs.push({field: 'secondPassPayout',displayName: '2nd Pass', cellTemplate: 'PayoffCellTemplate.html'});
     }

@@ -81,12 +81,12 @@ app.factory('ChartColorService', function(MiscUtil){
 app.controller('PayoffChartControl', function(
     $scope,
     ClaimantsData,
-    UIConfiguration,
+    InputParameters,
     ChartControlService,
     ChartColorService) {
 
     var initialSeries;
-    if (UIConfiguration.isTwoPass) {
+    if (InputParameters.isTwoPass) {
         initialSeries = ChartControlService.generateTwoPassPaymentSeries();
 
         var themeColors = Highcharts.getOptions
@@ -112,7 +112,7 @@ app.controller('PayoffChartControl', function(
                 formatter: ChartColorService.formatToolTip
 
             },
-            colors: ChartColorService.getColorScheme(UIConfiguration.isTwoPass)
+            colors: ChartColorService.getColorScheme(InputParameters.isTwoPass)
         },
         xAxis: {
             categories: []
@@ -130,7 +130,7 @@ app.controller('PayoffChartControl', function(
         loading: false
     };
 
-    if (UIConfiguration.isTwoPass) {
+    if (InputParameters.isTwoPass) {
         ChartControlService.watchTwoPassPaymentSeries($scope, ClaimantsData);
     } else {
         ChartControlService.watchOnePassPaymentSeries($scope, ClaimantsData);
