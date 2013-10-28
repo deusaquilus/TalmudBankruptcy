@@ -123,14 +123,15 @@ function GlobalApplicationControl($scope, MiscUtil, InputParameters) {
 app.factory('InputParameters', function($location) {
     return {
         isTwoPass: ($location.search()['twopass'] != undefined),
-        showdetails: ($location.search()['showdetails'] != undefined)
+        showdetails: ($location.search()['showdetails'] != undefined),
+        estate: ($location.search()['estate'] != undefined) ? Number($location.search()['estate']) : 300
     }
 });
 
 
-app.factory('ClaimantsData', function(){
+app.factory('ClaimantsData', function(InputParameters){
     return {
-        estate: 300,
+        estate: InputParameters.estate,
         numClaimants:3,
         maxNumClaimants:10,
         fullClaimantsList: Engine.BankrupcyCaseWrapper.createClaimants(100, 100, 20),
